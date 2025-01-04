@@ -95,7 +95,11 @@ func (c *Client) Authenticate() error {
 	if err != nil {
 		return err
 	}
+
+	c.Lock()
 	c.Session = s
+	c.Unlock()
+
 	return nil
 }
 
