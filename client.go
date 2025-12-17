@@ -63,6 +63,15 @@ func (c *Client) WithAccessToken(token string) *Client {
 // if you need to access information from the Session object prior to the first
 // request
 func (c *Client) Authenticate() error {
+	return c.AuthenticateWithContext(context.Background())
+}
+
+// AuthenticateWithContext authenticates the client and retrieves the Session object.
+// Authenticate will be called automatically when Do is called if the Session
+// object hasn't already been initialized. Call Authenticate before any requests
+// if you need to access information from the Session object prior to the first
+// request
+func (c *Client) AuthenticateWithContext(ctx context.Context) error {
 	c.Lock()
 	if c.SessionEndpoint == "" {
 		c.Unlock()
@@ -70,7 +79,7 @@ func (c *Client) Authenticate() error {
 	}
 	c.Unlock()
 
-	req, err := http.NewRequest("GET", c.SessionEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", c.SessionEndpoint, nil)
 	if err != nil {
 		return err
 	}
