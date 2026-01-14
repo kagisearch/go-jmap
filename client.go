@@ -120,7 +120,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	c.Lock()
 	if c.Session == nil {
 		c.Unlock()
-		err := c.Authenticate()
+		err := c.AuthenticateWithContext(req.Context)
 		if err != nil {
 			return nil, err
 		}
@@ -216,7 +216,7 @@ func (c *Client) UploadWithContext(
 	}
 	if c.Session == nil {
 		c.Unlock()
-		err := c.Authenticate()
+		err := c.AuthenticateWithContext(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -272,7 +272,7 @@ func (c *Client) DownloadWithContext(
 	}
 	if c.Session == nil {
 		c.Unlock()
-		err := c.Authenticate()
+		err := c.AuthenticateWithContext(ctx)
 		if err != nil {
 			return nil, err
 		}
