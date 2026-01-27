@@ -7,7 +7,7 @@ import "git.sr.ht/~rockorager/go-jmap"
 type SortComparator struct {
 	Property string `json:"property,omitempty"`
 
-	Keyword string `json:"keyword,omitempty"`
+	Keyword Keyword `json:"keyword,omitempty"`
 
 	IsAscending bool `json:"isAscending"`
 

@@ -34,15 +34,15 @@ type FilterCondition struct {
 
 	MaxSize uint64 `json:"maxSize,omitempty"`
 
-	AllInThreadHaveKeyword string `json:"allInThreadHaveKeyword,omitempty"`
+	AllInThreadHaveKeyword Keyword `json:"allInThreadHaveKeyword,omitempty"`
 
-	SomeInThreadHaveKeyword string `json:"someInThreadHaveKeyword,omitempty"`
+	SomeInThreadHaveKeyword Keyword `json:"someInThreadHaveKeyword,omitempty"`
 
-	NoneInThreadHaveKeyword string `json:"noneInThreadHaveKeyword,omitempty"`
+	NoneInThreadHaveKeyword Keyword `json:"noneInThreadHaveKeyword,omitempty"`
 
-	HasKeyword string `json:"hasKeyword,omitempty"`
+	HasKeyword Keyword `json:"hasKeyword,omitempty"`
 
-	NotKeyword string `json:"notKeyword,omitempty"`
+	NotKeyword Keyword `json:"notKeyword,omitempty"`
 
 	HasAttachment bool `json:"hasAttachment,omitempty"`
 

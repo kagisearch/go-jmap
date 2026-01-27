@@ -26,7 +26,7 @@ type EmailImport struct {
 
 	MailboxIDs map[jmap.ID]bool `json:"mailboxIds,omitempty"`
 
-	Keywords map[string]bool `json:"keywords,omitempty"`
+	Keywords map[Keyword]bool `json:"keywords,omitempty"`
 
 	ReceivedAt *time.Time `json:"receivedAt,omitempty"`
 }
