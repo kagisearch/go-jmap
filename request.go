@@ -21,15 +21,17 @@ type Request struct {
 	CreatedIDs map[ID]ID `json:"createdIds,omitempty"`
 }
 
+type CallID string
+
 // Invoke a method. Each call to Invoke will add the passed Method to the
 // Request. The Requires method will be called and added to the request. The
 // CallID of the Method is returned. CallIDs are assigned as the hex
 // representation of the index of the call, eg "0"
-func (r *Request) Invoke(m Method) string {
+func (r *Request) Invoke(m Method) CallID {
 	i := &Invocation{
 		Name:   m.Name(),
 		Args:   m,
-		CallID: fmt.Sprintf("%x", len(r.Calls)),
+		CallID: CallID(fmt.Sprintf("%x", len(r.Calls))),
 	}
 	r.Calls = append(r.Calls, i)
 

@@ -17,7 +17,7 @@ func TestChanges(t *testing.T) {
 	req := &jmap.Request{}
 
 	id := req.Invoke(m)
-	assert.Equal(t, "0", id)
+	assert.Equal(t, jmap.CallID("0"), id)
 
 	data, err := json.Marshal(req)
 	assert.NoError(t, err)

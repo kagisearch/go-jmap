@@ -46,7 +46,7 @@ func TestInvocationUnmarshal(t *testing.T) {
 	err := json.Unmarshal(raw, inv)
 	assert.NoError(err)
 	assert.Equal("Test/method", inv.Name)
-	assert.Equal("0", inv.CallID)
+	assert.Equal(CallID("0"), inv.CallID)
 
 	test, ok := inv.Args.(*test)
 	t.Logf("TIMBUG %T", inv.Args)

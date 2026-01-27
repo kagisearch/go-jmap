@@ -69,7 +69,7 @@ type AddedItem struct {
 type ResultReference struct {
 	// The method call id (see Section 3.1.1) of a previous method call in
 	// the current request.
-	ResultOf string `json:"resultOf"`
+	ResultOf CallID `json:"resultOf"`
 
 	// The required name of a response to that method call.
 	Name string `json:"name"`

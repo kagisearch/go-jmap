@@ -12,7 +12,7 @@ type Invocation struct {
 	// Object containing the named arguments for the method or response
 	Args interface{}
 	// Arbitrary string set by client, echoed back with responses
-	CallID string
+	CallID CallID
 }
 
 func (i *Invocation) MarshalJSON() ([]byte, error) {

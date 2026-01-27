@@ -20,7 +20,7 @@ func TestResponseUnmarshal(t *testing.T) {
 
 	inv := resp.Responses[0]
 	assert.Equal("Test/method", inv.Name)
-	assert.Equal("0", inv.CallID)
+	assert.Equal(CallID("0"), inv.CallID)
 
 	echo, ok := inv.Args.(*test)
 	assert.Truef(ok, "invocation arguments are not type *Echo")
