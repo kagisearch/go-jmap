@@ -19,7 +19,7 @@ func (fo *FilterOperator) implementsFilter() {}
 type FilterCondition struct {
 	Name string `json:"name,omitempty"`
 
-	IsActive *bool `json:"isActive,omitempty"`
+	IsActive bool `json:"isActive,omitempty"`
 }
 
 func (fc *FilterCondition) implementsFilter() {}
