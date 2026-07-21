@@ -30,6 +30,12 @@ func ResponseByCallID[T any](resp *Response, id CallID) (T, error) {
 			if args, ok := r.Args.(T); ok {
 				return args, nil
 			}
+			// A method-level failure replaces the expected response with an
+			// error invocation under the same call id. Return the server's
+			// actual error rather than the opaque NotFoundError below.
+			if methodErr, ok := r.Args.(*MethodError); ok {
+				return zero, methodErr
+			}
 		}
 	}
 	return zero, NotFoundError[T]{ID: id}
