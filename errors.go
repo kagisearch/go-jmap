@@ -19,10 +19,22 @@ type RequestError struct {
 }
 
 func (e *RequestError) Error() string {
-	if e.Limit != nil {
-		return fmt.Sprintf("%s: %s", e.Detail, *e.Limit)
+	// A server may send any subset of these; fall back through them so the error
+	// is never empty and always names its status code when one is known.
+	msg := e.Detail
+	if msg == "" {
+		msg = e.Type
 	}
-	return fmt.Sprintf(e.Detail)
+	if e.Limit != nil {
+		msg = fmt.Sprintf("%s: %s", msg, *e.Limit)
+	}
+	if e.Status == 0 {
+		return msg
+	}
+	if msg == "" {
+		return fmt.Sprintf("HTTP %d", e.Status)
+	}
+	return fmt.Sprintf("HTTP %d: %s", e.Status, msg)
 }
 
 // A MethodError is returned when an error occurred while the server was

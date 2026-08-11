@@ -91,7 +91,7 @@ func (c *Client) AuthenticateWithContext(ctx context.Context) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("couldn't authenticate")
+		return fmt.Errorf("jmap session: %w", decodeHttpError(resp))
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -309,12 +309,14 @@ func (c *Client) DownloadWithContext(
 func decodeHttpError(resp *http.Response) error {
 	contentType := resp.Header.Get("Content-Type")
 	if contentType != "application/json" {
-		return fmt.Errorf("HTTP %d %s", resp.StatusCode, resp.Status)
+		return fmt.Errorf("HTTP %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
-	reqErr := &RequestError{}
+	// Seed Status from the response so the error names its status code even when
+	// the body omits it.
+	reqErr := &RequestError{Status: resp.StatusCode}
 	if err := json.NewDecoder(resp.Body).Decode(reqErr); err != nil {
-		return fmt.Errorf("HTTP %d %s (failed to decode JSON body: %v)", resp.StatusCode, resp.Status, err)
+		return fmt.Errorf("HTTP %d %s (failed to decode JSON body: %v)", resp.StatusCode, http.StatusText(resp.StatusCode), err)
 	}
 
 	return reqErr
