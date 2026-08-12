@@ -62,6 +62,40 @@ func TestAuthenticateSurfacesRequestError(t *testing.T) {
 	assert.Equal(t, "HTTP 429: too many concurrent requests: concurrentRequests", reqErr.Error())
 }
 
+// Problem details arrive as "application/problem+json", and any JSON media type
+// may carry parameters. Matching the header exactly would drop the body and
+// leave nothing but the status line.
+func TestAuthenticateRequestErrorContentTypes(t *testing.T) {
+	for _, contentType := range []string{
+		"application/json",
+		"application/json; charset=utf-8",
+		"application/problem+json",
+		"application/problem+json; charset=utf-8",
+	} {
+		t.Run(contentType, func(t *testing.T) {
+			c := sessionErrorClient(t, func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", contentType)
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(`{
+					"type": "urn:ietf:params:jmap:error:limit",
+					"status": 400,
+					"detail": "The request exceeds the maximum number of concurrent requests.",
+					"limit": "maxConcurrentRequests"
+				}`))
+			})
+
+			err := c.Authenticate()
+			require.Error(t, err)
+
+			var reqErr *RequestError
+			require.True(t, errors.As(err, &reqErr))
+			assert.Equal(t, "urn:ietf:params:jmap:error:limit", reqErr.Type)
+			assert.Contains(t, err.Error(), "The request exceeds the maximum number of concurrent requests.")
+			assert.Contains(t, err.Error(), "maxConcurrentRequests")
+		})
+	}
+}
+
 // A JSON body that omits "status" still reports the response's status code.
 func TestAuthenticateRequestErrorWithoutStatus(t *testing.T) {
 	c := sessionErrorClient(t, func(w http.ResponseWriter, r *http.Request) {

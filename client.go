@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"strings"
 	"sync"
@@ -306,9 +307,20 @@ func (c *Client) DownloadWithContext(
 	return resp.Body, nil
 }
 
+// isJSONMediaType reports whether a Content-Type header names a JSON body.
+// Servers report JMAP problem details as "application/problem+json" (RFC 8620
+// section 3.6.1), and may append parameters such as "; charset=utf-8" to either
+// that or a plain "application/json".
+func isJSONMediaType(contentType string) bool {
+	mediaType, _, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return false
+	}
+	return mediaType == "application/json" || strings.HasSuffix(mediaType, "+json")
+}
+
 func decodeHttpError(resp *http.Response) error {
-	contentType := resp.Header.Get("Content-Type")
-	if contentType != "application/json" {
+	if !isJSONMediaType(resp.Header.Get("Content-Type")) {
 		return fmt.Errorf("HTTP %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
