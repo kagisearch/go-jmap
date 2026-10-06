@@ -1,6 +1,7 @@
 package email
 
 import (
+	"encoding/json"
 	"time"
 
 	"git.sr.ht/~rockorager/go-jmap"
@@ -81,6 +82,42 @@ type Email struct {
 	SMIMEErrors []string `json:"smimeErrors,omitempty"`
 
 	SMIMEVerifiedAt *time.Time `json:"smimeVerifiedAt,omitempty"`
+}
+
+type email Email
+
+// UnmarshalJSON decodes an Email, leaving a date nil when the server sends
+// one that isn't valid RFC 3339. Servers derive these dates from the message
+// itself, so real mail produces values like a five-digit year that a
+// time.Time can't decode, and one such message would otherwise fail the
+// whole method response it arrived in.
+func (e *Email) UnmarshalJSON(data []byte) error {
+	raw := struct {
+		*email
+		ReceivedAt      json.RawMessage `json:"receivedAt,omitempty"`
+		SentAt          json.RawMessage `json:"sentAt,omitempty"`
+		SMIMEVerifiedAt json.RawMessage `json:"smimeVerifiedAt,omitempty"`
+	}{email: (*email)(e)}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	e.ReceivedAt = parseDate(raw.ReceivedAt)
+	e.SentAt = parseDate(raw.SentAt)
+	e.SMIMEVerifiedAt = parseDate(raw.SMIMEVerifiedAt)
+	return nil
+}
+
+// parseDate decodes a JMAP Date or UTCDate, returning nil for an absent,
+// null, or unparseable value.
+func parseDate(raw json.RawMessage) *time.Time {
+	if len(raw) == 0 {
+		return nil
+	}
+	var t *time.Time
+	if err := json.Unmarshal(raw, &t); err != nil {
+		return nil
+	}
+	return t
 }
 
 type AddressGroup struct {
